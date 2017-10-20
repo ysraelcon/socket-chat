@@ -1,0 +1,8 @@
+node chat con socket
+
+recursos:
+ https://geekytheory.com/tutorial-node-js-crear-un-chat-parte-1
+ 
+ https://github.com/GeekyTheory/nodechat
+ 
+ 
