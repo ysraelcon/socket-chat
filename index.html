@@ -4,21 +4,31 @@
             Node.js chat
         </title>
         <style>
-            #dvchatcont{
-                display: none;
-            }
+            #dvchtc{
+               display:flex;}
+          
             #chatWrap{
-                float: left;
-            }
+                float: left;}
+          
             #chat{
                 position: relative;
                 width: 100%;
                 float:left;
                 min-height:100px;
                 height: 90%;
-                overflow: auto;
-            }
-          .bd{border:0.5px solid grey;}
+                overflow: auto;}
+                    
+          #dvcht1{
+            display:inline-block;
+            height:300px;
+           border:1px solid grey;}
+          
+          #dvcht2{
+            border:1px solid grey;}
+          
+          #dvusrs, #dvusrs2{
+            display:inline-block;
+            border:1px solid blue;}
         </style>
         
         <script src="https://code.jquery.com/jquery.js"></script>
@@ -63,53 +73,71 @@
   
 </div>          
    
-   <div id="dvchatcont">
    
-   <div class="row">
-<div class="col-xs-8 well">
-  
-  <div class="panel-heading">Chat</div>
-  
-  <form id="send-message">
-    <div class="form-group">
- <input id="message" type="text" placeholder="write your message...">
- <button type="submit"><span class="glyphicon glyphicon-send"></span> Send</button><!-- http://glyphicons.com/ -->
-</div>
-      </form>
-  
-  
-<div id="chat" ></div>
-  
-</div><!-- chat -->
-<div class="col-xs-4 well">
-  
-  <div class="panel-heading">
-                            Users <span class="badge">0</span>
-                        </div>
-  
-  <div id="users"></div> 
-  
-</div><!-- users -->
-</div>
+   
+   
+   <div id="dvchtc">
+   
+   
      
-   </div>
+<div id="dvusrs">
+<span>Users</span>
+<div id="dvusrsc"></div>
+</div><!-- users -->
+     
+ <div id="dvcht1">
+<span>Chat</span>
+<form id="fmsndmsg">
+ <input type="text" placeholder="write your message" id="inmsg1">
+<button type="submit">
+<span class="glyphicon glyphicon-send"></span>Send</button>
+</form>
+<div id="dvchtmsg"></div>
+</div><!-- chat -->
+     
+<div id="dvcht2">
+<span>Chat
+  <input type="button" value="ir chat2" id="btncht2">
+  <input type="button" value="dejar chat2" id="btndjcht2">
+  </span>
+<form id="fmsndmsg2">
+ <input type="text" placeholder="write your message" id="inmsg2">
+<button type="submit">
+<span class="glyphicon glyphicon-send"></span>Send</button>
+</form>
+<div id="dvchtmsg2"></div>
+</div><!-- chat -->
+     
+     <div id="dvusrs2">
+<span>Users</span>
+<div id="dvusrsc2"></div>
+</div><!-- users -->
+     
+
+    </div>
             
-        </div>
+        </div><!-- container -->
   
         <script src="/socket.io/socket.io.js"></script>
         <script>
             jQuery(function($) {
                var socket = io.connect();
-               var $messageForm = $('#send-message');
-               var $messageBox = $('#message');
-               var $chat = $('#chat');
-               var $buttonSend = $('#send');
+               var $fmsndmsg = $('#fmsndmsg');
+               var $inmsg1 = $('#inmsg1');
+               var $dvchtmsg = $('#dvchtmsg');
+              
+              var $fmsndmsg2 = $('#fmsndmsg2');
+               var $inmsg2 = $('#inmsg2');
+               var $dvchtmsg2 = $('#dvchtmsg2');
                
                var $nickForm = $('#setNick');
                var $nickBox = $('#nickname');
-               var $users = $('#users');
+               var $dvusrsc = $('#dvusrsc');
+              var $dvusrsc2 = $('#dvusrsc2');
                var $closeAlert = $('#closeAlert');
-               
+               var room="abc123";
+              var $btncht2=$('#btncht2');
+              var $btndjcht2=$('#btndjcht2');
                
                
                $nickForm.click(function(e) {
@@ -117,7 +145,7 @@
                    socket.emit('new user', $nickBox.val(), function(data) {
                        if(data) {
                            $('#nickWrap').hide();
-                           $('#dvchatcont').show();
+                           $('#dvchtc').show();
                        } else {
                            $("#login-error").show();
                        }
@@ -129,14 +157,52 @@
                     $("#login-error").hide();
                });
                
-               $messageForm.submit(function(e) {
+               $fmsndmsg.submit(function(e) {
                    e.preventDefault();
-                   if($messageBox.val()!='') socket.emit('send message', $messageBox.val());
-                   $messageBox.val('');
+                   if($inmsg1.val()!='') socket.emit('send message', $inmsg1.val());
+                   $inmsg1.val('');
+               });
+              
+              $fmsndmsg2.submit(function(e) {
+                   e.preventDefault();
+                   if($inmsg2.val()!='') socket.emit('send message2', $inmsg2.val());
+                   $inmsg2.val('');
                });
                
+              
+              $btncht2.on("click",function(){
+ socket.emit("room",room);
+     
+});
+             
+    socket.on('new user2',function(data){
+                var lisu=""
+                for(var el in data){
+                  lisu+=data[el]+"<br>";
+                }//
+                
+                $dvusrsc2.html(lisu);
+              });
+              
+   socket.on('clear user2',function(data){
+                var lisu=""
+                for(var el in data){
+                  lisu+=data[el]+"<br>";
+                }//
+                
+                $dvusrsc2.html(lisu);
+              });
+              
+              $btndjcht2.on("click",function(){
+ socket.emit("roomdj",room);
+});
+              
                socket.on('new message', function(data) {
-                  $chat.append('<b>'+data.nick+":</b> "+data.msg+"<br/>"); 
+                  $dvchtmsg.append('<b>'+data.nick+":</b> "+data.msg+"<br/>"); 
+               });
+              
+              socket.on('new message2', function(data) {
+                  $dvchtmsg2.append('<b>'+data.nick+":</b> "+data.msg+"<br/>"); 
                });
                
                socket.on('usernames', function(data) {
@@ -144,7 +210,7 @@
                     for (var username in data) {
                         html += username + '<br/>';
                     }
-                    $users.html(html);
+                    $dvusrsc.html(html);
                 });
                
             });
