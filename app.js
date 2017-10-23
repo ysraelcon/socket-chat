@@ -3,20 +3,39 @@ var express = require('express'),
     server = require('http').createServer(app),
     io = require("socket.io").listen(server),
     nicknames = {};
+var usrsen2={};
 
 //server.listen(8000);
 server.listen(process.env.PORT, process.env.IP);
 
 
 app.get('/', function(req, res) {
-    res.sendfile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 
 io.sockets.on('connection', function(socket) {
   
+  socket.on('room',function(room){
+    socket.join(room);
+    usrsen2[socket.nickname]=socket.nickname;
+    socket.emit('new user2',usrsen2);
+  });
+  
+  socket.on('roomdj',function(room){
+    socket.leave(room);
+    
+    delete usrsen2[socket.nickname];
+    socket.emit('clear user2',usrsen2);
+  });
+  
     socket.on('send message', function(data) {
         io.sockets.emit('new message', {msg: data, nick: socket.nickname});
+    });
+  
+  socket.on('send message2', function(data) {
+    var room="abc123";
+        io.sockets.in(room).emit('new message2', {msg: data, nick: socket.nickname});
     });
     
     socket.on('new user', function(data, callback) {

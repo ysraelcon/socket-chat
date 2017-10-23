@@ -5,4 +5,8 @@ recursos:
  
  https://github.com/GeekyTheory/nodechat
  
+rooms:
+ http://psitsmike.com/2011/10/node-js-and-socket-io-multiroom-chat-tutorial/
+
+ https://github.com/radzserg/stw_chat/blob/master/server.js
  
